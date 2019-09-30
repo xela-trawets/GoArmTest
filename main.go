@@ -57,7 +57,7 @@ func main() {
 
 	//	__DMA_AND_DATA_SOURCE := "/dev/uio3"
 	//  MAIN_MEMORY_ACCESS = /dev/mydevice
-	file, err := os.Open("/dev/uio3")
+	file, err := os.OpenFile("/dev/uio3", os.O_RDWR, 0755)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -66,7 +66,7 @@ func main() {
 	var baseAddress int64 = 0x1000
 	var bufferSize = 4 * 0x100
 
-	mmap2, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
+	mmap2, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ, syscall.MAP_SHARED)
 	if err != nil {
 		log.Fatal(err)
 	}
