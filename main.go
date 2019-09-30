@@ -41,6 +41,7 @@ func main() {
 	}
 	addr_imaging_units := 0x0F8C
 	addr_BitsPerPixel := 0x0F98
+
 	//addr_total_onboard_ram_lower := 0x1080
 	//__dma_ddr_size_reg := 0x08
 	//__dma_ddr_head_reg := 0x2c
@@ -54,7 +55,55 @@ func main() {
 	}
 	fmt.Printf("Hello %x\n", mapped.At(addr_imaging_units))
 
+	//	__DMA_AND_DATA_SOURCE := "/dev/uio3"
+	mapped2, err := mmap.Open("/dev/uio3")
+	if err != nil {
+		fmt.Println("Error mmapping 2: ", err)
+	}
+	__dma_ddr_base_reg := 0x04
+	for i := 0; i < 4; i++ {
+		fmt.Printf("Hello %x\n", mapped.At(addr_BitsPerPixel+i))
+	}
+	//__DDR_base = __ptrDMA[__dma_ddr_base_reg/4]
+
+	// fd_dma = open(__DMA_AND_DATA_SOURCE, O_RDWR);
+	// if (fd_dma < 1) {
+	// ptr = 0;
+	// printf("Invalid UIO device file\n\r");
+	// }
+	// else {
+	// /* mmap the UIO device */
+	// ptr = (pvui)mmap(NULL, UIO_MAP_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd_dma, offset);
+	// }
+
+	//*((uint32_t*)(ptrRegBank + addr_detector_ready )) = 1;
 }
+
+// pvui open_dma( off_t offset)
+// {
+
+// pvui ptr;
+
+// 	/* Open the UIO device file */
+// 	fd_dma = open(__DMA_AND_DATA_SOURCE, O_RDWR);
+// 	if (fd_dma < 1) {
+// 	ptr = 0;
+// 	printf("Invalid UIO device file\n\r");
+// 	}
+// 	else {
+// 	/* mmap the UIO device */
+// 	//ptr = (pvui)mmap(NULL, UIO_MAP_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd_dma, offset);
+// 	ptr = (pvui)mmap(NULL, UIO_MAP_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd_dma, offset);
+// 	//*((unsigned *)(ptr + 4)) = 1344;
+// 	}
+// 	return ptr;
+// }
+// void close_dma(pvui ptr)
+// {
+
+//     munmap((void*)ptr, UIO_MAP_SIZE);
+//     close(fd_dma);
+// }
 
 func Readu32(baseAddress int64, offset int64) uint32 {
 	var value uint32 = 0xFFFFFFFF
