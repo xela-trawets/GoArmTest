@@ -56,13 +56,14 @@ func main() {
 	fmt.Printf("Hello %x\n", mapped.At(addr_imaging_units))
 
 	//	__DMA_AND_DATA_SOURCE := "/dev/uio3"
+	//  MAIN_MEMORY_ACCESS = /dev/mydevice
 	mapped2, err := mmap.Open("/dev/uio3")
 	if err != nil {
 		fmt.Println("Error mmapping 2: ", err)
 	}
 	//__dma_ddr_base_reg := 0x04
 	for i := 0; i < 4; i++ {
-		fmt.Printf("Hello %x\n", mapped2.At(addr_BitsPerPixel+i))
+		fmt.Printf("Hello %x\n", mapped2.At(0x1000+addr_BitsPerPixel+i))
 	}
 	//__DDR_base = __ptrDMA[__dma_ddr_base_reg/4]
 
