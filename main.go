@@ -63,8 +63,8 @@ func main() {
 	}
 
 	defer file.Close()
-	var baseAddress int64 = 0x1000
-	var bufferSize int64 = 4 * 0x100
+	var baseAddress = 0x1000
+	var bufferSize = 4 * 0x100
 
 	mmap2, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
 	if err != nil {
@@ -75,7 +75,8 @@ func main() {
 	// 	fmt.Println("Error mmapping 2: ", err)
 	// }
 	//__dma_ddr_base_reg := 0x04
-	for i := 0; i < 4; i++ {
+	for i := 0; i < 32; i++ {
+		offset = i * 4
 		value = *(*uint32)(unsafe.Pointer(&mmap2[offset]))
 		fmt.Printf("Hello %x\n", value) // mapped2.At(0x1000+addr_BitsPerPixel+i))
 	}
