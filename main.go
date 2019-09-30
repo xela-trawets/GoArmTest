@@ -57,13 +57,27 @@ func main() {
 
 	//	__DMA_AND_DATA_SOURCE := "/dev/uio3"
 	//  MAIN_MEMORY_ACCESS = /dev/mydevice
-	mapped2, err := mmap.Open("/dev/uio3")
+	file, err := os.Open("/dev/uio3")
 	if err != nil {
-		fmt.Println("Error mmapping 2: ", err)
+		log.Fatal(err)
 	}
+
+	defer file.Close()
+	var baseAddress int64 = 0x1000
+	var bufferSize int64 = 4 * 0x100
+
+	mmap2, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// mapped2, err := mmap.Open("/dev/uio3")
+	// if err != nil {
+	// 	fmt.Println("Error mmapping 2: ", err)
+	// }
 	//__dma_ddr_base_reg := 0x04
 	for i := 0; i < 4; i++ {
-		fmt.Printf("Hello %x\n", mapped2.At(0x1000+addr_BitsPerPixel+i))
+		value = *(*uint32)(unsafe.Pointer(&mmap2[offset]))
+		fmt.Printf("Hello %x\n", value) // mapped2.At(0x1000+addr_BitsPerPixel+i))
 	}
 	//__DDR_base = __ptrDMA[__dma_ddr_base_reg/4]
 
