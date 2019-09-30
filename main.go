@@ -60,9 +60,9 @@ func main() {
 	if err != nil {
 		fmt.Println("Error mmapping 2: ", err)
 	}
-	__dma_ddr_base_reg := 0x04
+	//__dma_ddr_base_reg := 0x04
 	for i := 0; i < 4; i++ {
-		fmt.Printf("Hello %x\n", mapped.At(addr_BitsPerPixel+i))
+		fmt.Printf("Hello %x\n", mapped2.At(addr_BitsPerPixel+i))
 	}
 	//__DDR_base = __ptrDMA[__dma_ddr_base_reg/4]
 
