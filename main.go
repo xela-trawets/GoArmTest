@@ -227,7 +227,7 @@ func main() {
 
 	RingBuffer := (*uint32)(unsafe.Pointer(&rbMmap[0]))
 	//DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
-	fmt.Printf(" Data 0x%08x \r\n", RingBuffer[0])
+	fmt.Printf(" Data 0x%08x \r\n", rbMmap[0])
 }
 
 // pvui open_dma( off_t offset)
