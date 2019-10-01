@@ -232,6 +232,7 @@ func main() {
 
 	//TcpServer trigger and addr_detector_ready
 	var addr_detector_ready = 0x0F60
+	fmt.Printf(" a gap \r\n")
 	(*(int32*)(unsafe.Pointer(regMmap[addr_detector_ready] ))) = 1
 	//RingBuffer := (*uint32)(unsafe.Pointer(&rbMmap[0]))
 	//DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
