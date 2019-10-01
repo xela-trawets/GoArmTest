@@ -181,7 +181,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer Munmap(regMmap)
+	defer syscall.Munmap(regMmap)
 	addr_imaging_units := 0x0F8C
 	// addr_BitsPerPixel := 0x0F98
 
@@ -215,7 +215,7 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Printf(" mapped uio3 at 0x%08x \r\n", unsafe.Pointer(&mmap2[0]))
-	defer Munmap(mmap2)
+	defer syscall.Munmap(mmap2)
 
 	for i := 0; i < 4; i++ {
 		offset := i * 4
@@ -249,7 +249,7 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Printf(" mapped module at 0x%08x \r\n", unsafe.Pointer(&rbMmap[0]))
-	defer Munmap(rbMmap)
+	defer syscall.Munmap(rbMmap)
 
 	//TcpServer trigger and addr_detector_ready
 	//var addr_detector_ready = 0x0F60
@@ -268,10 +268,10 @@ func main() {
 
 	fmt.Printf(" Sem triggered 0x%08x \r\n", rbMmap[0])
 
-	base := *(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg]))
+	rbBase int64 = *(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg]))
 	pHead := (*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_head_reg]))
 
-	fmt.Printf(" head 0x%08x \r\n", *pHead-base)
+	fmt.Printf(" head 0x%08x \r\n", *pHead-rbBase)
 	//*(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg])))
 	//mysem.Close()
 }
