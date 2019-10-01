@@ -71,7 +71,7 @@ type semaphore struct {
 }
 
 func openSem(name string, excl bool) (*semaphore, error) {
-	name = fmt.Sprintf("/%s", name)
+	name = fmt.Sprintf("%s", name)
 	cName := C.CString(name)
 
 	flags := C.O_CREAT
@@ -237,8 +237,8 @@ func main() {
 	detector_ready := *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
 	fmt.Printf(" addr_detector_ready 0x%08x \r\n", detector_ready)
 	*(*int32)(unsafe.Pointer(&regMmap[addr_detector_ready])) = 1
-	detector_ready := *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
-	fmt.Printf(" addr_detector_ready 0x%08x \r\n", detector_ready)
+	detector_ready1 := *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
+	fmt.Printf(" addr_detector_ready 0x%08x \r\n", detector_ready1)
 	//RingBuffer := (*uint32)(unsafe.Pointer(&rbMmap[0]))
 	//DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" Awaiting Data 0x%08x \r\n", rbMmap[0])
