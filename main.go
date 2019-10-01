@@ -220,13 +220,13 @@ func main() {
 	//PROT_READ | PROT_WRITE,  MAP_SHARED , fd_mem, __DDR_offset );
 	//rbMmap2, err := syscall.Mmap(int(rbFile.Fd()), __DDR_base, DDR_size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
 	//using kernel module
-	rbMmap, err := syscall.Mmap(int(rbFile.Fd()), 0, DDR_size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED,)
+	rbMmap, err := syscall.Mmap(int(rbFile.Fd()), 0, DDR_size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	RingBuffer := *(*uint32)(unsafe.Pointer(&rbMmap[]))
-	DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
+	RingBuffer := (*uint32)(unsafe.Pointer(&rbMmap[0]))
+	//DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" Data 0x%08x \r\n", RingBuffer[0])
 }
 
