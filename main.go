@@ -164,7 +164,7 @@ func (s *semaphore) Unlock() error {
 }
 
 func (s *semaphore) Value() (int, error) {
-	return s.value()
+	return s.val()
 }
 
 func (s *semaphore) Wait() error {
