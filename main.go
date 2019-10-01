@@ -175,7 +175,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer regMapFile.Close()
-	regMmap, err := syscall.Mmap(int(file.Fd()), 0, 2 * 4096, syscall.PROT_READ, syscall.MAP_SHARED)
+	regMmap, err := syscall.Mmap(int(regMapFile.Fd()), 0, 2 * 4096, syscall.PROT_READ, syscall.MAP_SHARED)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -232,7 +232,7 @@ func main() {
 
 	//TcpServer trigger and addr_detector_ready
 	addr_detector_ready := 0x0F60
-	*(uint32*)(unsafe.Pointer(regMmap[addr_detector_ready] )) = 1
+	*(int*)(unsafe.Pointer(regMmap[addr_detector_ready] )) = 1
 	//RingBuffer := (*uint32)(unsafe.Pointer(&rbMmap[0]))
 	//DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" Awaiting Data 0x%08x \r\n", rbMmap[0])
