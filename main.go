@@ -57,7 +57,7 @@ func memcpy(dest, src []byte) int {
 
 func main() {
 	fmt.Println("Hello World")
-	mysem = unsafe.Pointer(&C.sem_open("trigger_sem", syscall.O_CREAT, 0777, 0))
+	mysem = semaphore.Open("trigger_sem", false)
 	//mysem = syscall.sem_open("trigger_sem", O_CREAT, 777, 0)
 	var base int64 = 0x35c00000 //1048576 * 768
 	//	var c128: complex128 = 0
