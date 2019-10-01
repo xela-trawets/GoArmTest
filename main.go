@@ -129,9 +129,9 @@ func (s *semaphore) TryWait() error {
 	}, "error trying wait on semaphore")
 }
 
-func (s *semaphore) TimedWait(t *time.Time) error {
-	return s.timedWait(t)
-}
+// func (s *semaphore) TimedWait(t *time.Time) error {
+// 	return s.timedWait(t)
+// }
 
 func Unlink(name string) error {
 	name = fmt.Sprintf("/%s", name)
