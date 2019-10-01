@@ -59,7 +59,6 @@ import (
 	"os"
 	"runtime"
 	"syscall"
-	"time"
 	"unsafe"
 
 	"github.com/akutz/goof"
@@ -160,7 +159,7 @@ func memcpy(dest, src []byte) int {
 
 func main() {
 	fmt.Println("Hello World")
-	mysem = semaphore.Open("trigger_sem", false)
+	mysem = semaphore.open("trigger_sem", false)
 	//mysem = syscall.sem_open("trigger_sem", O_CREAT, 777, 0)
 	var base int64 = 0x35c00000 //1048576 * 768
 	//	var c128: complex128 = 0
