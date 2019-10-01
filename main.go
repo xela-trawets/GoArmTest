@@ -263,15 +263,15 @@ func main() {
 	//DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" Awaiting Data 0x%08x \r\n", rbMmap[0])
 
-	//mysem.TryWait()//while ...
-	mysem.Wait()
+	t = mysem.TryWait() //while ...
+	//mysem.Wait()
 
-	fmt.Printf(" Sem triggered 0x%08x \r\n", rbMmap[0])
+	fmt.Printf(" Sem triggered 0x%08x \r\n", t)
 
 	rbBase := *(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg]))
 	pHead := (*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_head_reg]))
 
-	fmt.Printf(" head 0x%08x \r\n", *pHead-rbBase)
+	fmt.Printf(" head 0x%08x \r\n", (*pHead)-rbBase)
 	//*(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg])))
 	//mysem.Close()
 }
