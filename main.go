@@ -161,7 +161,9 @@ func main() {
 	mysem, err := openSem("trigger_sem", false)
 	if err != nil {
 		fmt.Println("Error on openSem: ", err)
+		log.Fatal(err)
 	}
+	fmt.Println("No Error on openSem: ", err)
 	//mysem = syscall.sem_open("trigger_sem", O_CREAT, 777, 0)
 	var base int64 = 0x35c00000 //1048576 * 768
 	//	var c128: complex128 = 0
@@ -179,11 +181,11 @@ func main() {
 		log.Fatal(err)
 	}
 	addr_imaging_units := 0x0F8C
-	addr_BitsPerPixel := 0x0F98
+	// addr_BitsPerPixel := 0x0F98
 
-	for i := 0; i < 4; i++ {
-		fmt.Printf("Hello %x\n", regMmap[addr_BitsPerPixel+i])
-	}
+	// for i := 0; i < 4; i++ {
+	// 	fmt.Printf("Hello %x\n", regMmap[addr_BitsPerPixel+i])
+	// }
 	fmt.Printf("Hello %x\n", regMmap[addr_imaging_units])
 
 	//	__DMA_AND_DATA_SOURCE := "/dev/uio3"
@@ -195,17 +197,20 @@ func main() {
 
 	defer file.Close()
 	var baseAddress int64 = 0x1000
-	var bufferSize = 4 * 0x100
+	var bufferSize = 2 * 0x1000
 
 	mmap2, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ, syscall.MAP_SHARED)
 	if err != nil {
+		fmt.Printf(" Cant mapped uio3 \r\n")
 		log.Fatal(err)
 	}
+	fmt.Printf(" mapped uio3 at 0x%08x \r\n", unsafe.Pointer(&mmap2[0]))
 
-	for i := 0; i < 32; i++ {
+	for i := 0; i < 4; i++ {
 		offset := i * 4
 		value := *(*uint32)(unsafe.Pointer(&mmap2[offset]))
 		fmt.Printf("Hello %x\n", value) // mapped2.At(0x1000+addr_BitsPerPixel+i))
+		log.Fatal(err)
 	}
 	__dma_ddr_size_reg := 0x08
 	__dma_ddr_base_reg := 0x04
@@ -246,7 +251,7 @@ func main() {
 	//mysem.TryWait()
 
 	fmt.Printf(" Sem triggered 0x%08x \r\n", rbMmap[0])
-	mysem.Close()
+	//mysem.Close()
 }
 
 // pvui open_dma( off_t offset)
