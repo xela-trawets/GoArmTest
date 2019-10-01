@@ -207,7 +207,7 @@ func main() {
 	__dma_ddr_base_reg := 0x04
 	var __DDR_base int64 = int64(*(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg])))
 	fmt.Printf(" DDR base understood to be at 0x%08x \r\n", __DDR_base)
-	DDR_size := *(*int32)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
+	DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" DDR base understood to be at 0x%08x \r\n", DDR_size)
 
 	rbFile, err := os.OpenFile("/dev/mydevice", os.O_RDWR|os.O_SYNC, 0755)
