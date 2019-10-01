@@ -13,33 +13,6 @@ import (
 
 /*
 #include <string.h>
-#include <semaphore.h>
-typedef struct {
-    sem_t*      val;
-    int         err;
-} sem_tt;
-sem_tt* _sem_open(char* name, int flags) {
-    sem_tt* r = (sem_tt*)malloc(sizeof(sem_tt));
-    sem_t* sem = sem_open((const char*)name, flags, 0644, 0);
-    if (sem == SEM_FAILED) r->err = errno;
-    else r->val = sem;
-    return r;
-}
-int _sem_close(void* sem) {
-    return sem_close(((sem_tt*)sem)->val) == 0 ? 0 : errno;
-}
-int _sem_wait(void* sem) {
-    return sem_wait(((sem_tt*)sem)->val) == 0 ? 0 : errno;
-}
-int _sem_trywait(void* sem) {
-    return sem_trywait(((sem_tt*)sem)->val) == 0 ? 0 : errno;
-}
-int _sem_post(void* sem) {
-    return sem_post(((sem_tt*)sem)->val) == 0 ? 0 : errno;
-}
-int _sem_unlink(char* name) {
-    return sem_unlink((const char*) name) == 0 ? 0 : errno;
-}
 */
 import "C"
 
