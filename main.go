@@ -80,6 +80,15 @@ func main() {
 		value := *(*uint32)(unsafe.Pointer(&mmap2[offset]))
 		fmt.Printf("Hello %x\n", value) // mapped2.At(0x1000+addr_BitsPerPixel+i))
 	}
+
+	__dma_ddr_size_reg := 0x08
+	//__dma_ddr_head_reg := 0x2c
+	__dma_ddr_base_reg := 0x04
+	__DDR_base := *(*uint32)(unsafe.Pointer(&mmap2(__dma_ddr_base_reg)))
+	fmt.Printf(stdout, " DDR base understood to be at 0x%08x \r\n", __DDR_base)
+	DDR_size := *(*uint32)(unsafe.Pointer(&mmap2(__dma_ddr__size_reg)))
+	fmt.Printf(stdout, " DDR base understood to be at 0x%08x \r\n", DDR_size)
+
 	//__DDR_base = __ptrDMA[__dma_ddr_base_reg/4]
 
 	// fd_dma = open(__DMA_AND_DATA_SOURCE, O_RDWR);
