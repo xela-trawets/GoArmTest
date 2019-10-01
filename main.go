@@ -170,17 +170,22 @@ func main() {
 	fmt.Printf("Hello %x\n", value)
 	fmt.Printf("Hello %s/%s\n", runtime.GOOS, runtime.GOARCH)
 	//mysem, err := sync.NewSemaphore("trigger_sem", O_CREAT, 777, 0)
-	mapped, err := mmap.Open("/usr/share/client")
+	regMapFile, err := os.OpenFile("/usr/share/client", os.O_RDWR, 0755)
 	if err != nil {
-		fmt.Println("Error mmapping: ", err)
+		log.Fatal(err)
+	}
+	defer regMapFile.Close()
+	regMmap, err := syscall.Mmap(int(file.Fd()), 0, 2 * 4096, syscall.PROT_READ, syscall.MAP_SHARED)
+	if err != nil {
+		log.Fatal(err)
 	}
 	addr_imaging_units := 0x0F8C
 	addr_BitsPerPixel := 0x0F98
 
 	for i := 0; i < 4; i++ {
-		fmt.Printf("Hello %x\n", mapped.At(addr_BitsPerPixel+i))
+		fmt.Printf("Hello %x\n", regMmap[addr_BitsPerPixel+i])
 	}
-	fmt.Printf("Hello %x\n", mapped.At(addr_imaging_units))
+	fmt.Printf("Hello %x\n", regMmap[addr_imaging_units])
 
 	//	__DMA_AND_DATA_SOURCE := "/dev/uio3"
 	//  MAIN_MEMORY_ACCESS = /dev/mydevice
@@ -227,7 +232,7 @@ func main() {
 
 	//TcpServer trigger and addr_detector_ready
 	addr_detector_ready			:=	0x0F60
-	*(uint32*)(&mapped[addr_detector_ready] ) = 1;
+	*(uint32*)(&regMmap[addr_detector_ready] ) = 1;
 	//RingBuffer := (*uint32)(unsafe.Pointer(&rbMmap[0]))
 	//DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" Awaiting Data 0x%08x \r\n", rbMmap[0])
