@@ -197,7 +197,7 @@ func main() {
 	fmt.Printf(" opened uio3 at 0x%08x \r\n", file.Fd)
 
 	defer file.Close()
-	var baseAddress int64 = 0x0
+	var baseAddress int64 = 0x1000
 	var bufferSize = 1 * 0x1000
 
 	mmap2, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ, syscall.MAP_SHARED)
