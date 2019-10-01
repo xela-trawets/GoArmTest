@@ -164,6 +164,7 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("No Error on openSem: ", err)
+	defer mysem.Close()
 	//mysem = syscall.sem_open("trigger_sem", O_CREAT, 777, 0)
 	var base int64 = 0x35c00000 //1048576 * 768
 	//	var c128: complex128 = 0
@@ -180,6 +181,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer Munmap(regMmap)
 	addr_imaging_units := 0x0F8C
 	// addr_BitsPerPixel := 0x0F98
 
@@ -213,6 +215,7 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Printf(" mapped uio3 at 0x%08x \r\n", unsafe.Pointer(&mmap2[0]))
+	defer Munmap(mmap2)
 
 	for i := 0; i < 4; i++ {
 		offset := i * 4
@@ -222,6 +225,7 @@ func main() {
 	}
 	__dma_ddr_size_reg := 0x08
 	__dma_ddr_base_reg := 0x04
+	__dma_ddr_head_reg := 0x2c
 	var __DDR_base int64 = int64(*(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg])))
 	fmt.Printf(" DDR base understood to be at 0x%08x \r\n", __DDR_base)
 	DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
@@ -245,6 +249,7 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Printf(" mapped module at 0x%08x \r\n", unsafe.Pointer(&rbMmap[0]))
+	defer Munmap(rbMmap)
 
 	//TcpServer trigger and addr_detector_ready
 	//var addr_detector_ready = 0x0F60
@@ -258,10 +263,16 @@ func main() {
 	//DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" Awaiting Data 0x%08x \r\n", rbMmap[0])
 
-	//mysem.TryWait()
+	//mysem.TryWait()//while ...
 	mysem.Wait()
 
 	fmt.Printf(" Sem triggered 0x%08x \r\n", rbMmap[0])
+
+	base := *(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg]))
+	pHead := (*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_head_reg]))
+
+	fmt.Printf(" head 0x%08x \r\n", *pHead-base)
+	//*(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg])))
 	//mysem.Close()
 }
 
