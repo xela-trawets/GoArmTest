@@ -6,6 +6,7 @@ import (
 	"os"
 	"runtime"
 	"syscall"
+	"time"
 	"unsafe"
 
 	"github.com/akutz/goof"
@@ -92,7 +93,7 @@ type Semaphore interface {
 	// TimedWait is the same as Wait(), except that abs_timeout
 	// specifies a limit on the amount of time that the call should block if
 	// the decrement cannot be immediately performed.
-	TimedWait(timeout *time.Time) error
+	//TimedWait(timeout *time.Time) error
 
 	// Value returns the current value of the semaphore. If one or more
 	// processes or threads are blocked waiting to lock the
@@ -138,6 +139,70 @@ func open(name string, excl bool) (Semaphore, error) {
 		cName: cName,
 		sema:  unsafe.Pointer(sema),
 	}, nil
+}
+func (s *semaphore) Close() error {
+	err := C._sem_close(s.sema)
+	if err == 0 {
+		return nil
+	}
+	return goof.WithFields(goof.Fields{
+		"name":  s.name,
+		"error": int(err),
+	}, "error closing semaphore")
+}
+
+func (s *semaphore) Unlock() error {
+	err := C._sem_post(s.sema)
+	if err == 0 {
+		return nil
+	}
+	return goof.WithFields(goof.Fields{
+		"name":  s.name,
+		"error": int(err),
+	}, "error unlocking semaphore")
+}
+
+func (s *semaphore) Value() (int, error) {
+	return s.value()
+}
+
+func (s *semaphore) Wait() error {
+	err := C._sem_wait(s.sema)
+	if err == 0 {
+		return nil
+	}
+	return goof.WithFields(goof.Fields{
+		"name":  s.name,
+		"error": int(err),
+	}, "error waiting on semaphore")
+}
+
+func (s *semaphore) TryWait() error {
+	err := C._sem_trywait(s.sema)
+	if err == 0 || err == C.EAGAIN {
+		return nil
+	}
+	return goof.WithFields(goof.Fields{
+		"name":  s.name,
+		"error": int(err),
+	}, "error trying wait on semaphore")
+}
+
+func (s *semaphore) TimedWait(t *time.Time) error {
+	return s.timedWait(t)
+}
+
+func Unlink(name string) error {
+	name = fmt.Sprintf("/%s", name)
+	cName := C.CString(name)
+	err := C._sem_unlink(cName)
+	if err == 0 {
+		return nil
+	}
+	return goof.WithFields(goof.Fields{
+		"name":  name,
+		"error": int(err),
+	}, "error unlinking semaphore")
 }
 
 func memcpy(dest, src []byte) int {
