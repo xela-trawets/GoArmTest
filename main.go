@@ -212,13 +212,15 @@ func main() {
 	var __DDR_base int64 = int64(*(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg])))
 	fmt.Printf(" DDR base understood to be at 0x%08x \r\n", __DDR_base)
 	DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
-	fmt.Printf(" DDR base understood to be at 0x%08x \r\n", DDR_size)
+	fmt.Printf(" DDR Size understood to be at 0x%08x \r\n", DDR_size)
 
 	rbFile, err := os.OpenFile("/dev/mydevice", os.O_RDWR|os.O_SYNC, 0755)
 	if err != nil {
+		fmt.Printf(" My Device Not Opened 0x%08x \r\n", rbFile.Fd)
 		log.Fatal(err)
 	}
 
+	fmt.Printf(" My Device Opened 0x%08x \r\n", rbFile.Fd)
 	defer rbFile.Close()
 
 	//PROT_READ | PROT_WRITE,  MAP_SHARED , fd_mem, __DDR_offset );
