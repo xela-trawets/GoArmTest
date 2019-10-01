@@ -268,7 +268,7 @@ func main() {
 
 	fmt.Printf(" Sem triggered 0x%08x \r\n", rbMmap[0])
 
-	var rbBase int64 = *(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg]))
+	rbBase := int64(*(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg])))
 	pHead := (*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_head_reg]))
 
 	fmt.Printf(" head 0x%08x \r\n", *pHead-rbBase)
