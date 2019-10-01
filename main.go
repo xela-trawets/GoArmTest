@@ -211,7 +211,7 @@ func main() {
 		offset := i * 4
 		value := *(*uint32)(unsafe.Pointer(&mmap2[offset]))
 		fmt.Printf("Hello %x\n", value) // mapped2.At(0x1000+addr_BitsPerPixel+i))
-		log.Fatal(err)
+		//log.Fatal(err)
 	}
 	__dma_ddr_size_reg := 0x08
 	__dma_ddr_base_reg := 0x04
@@ -234,8 +234,10 @@ func main() {
 	//using kernel module
 	rbMmap, err := syscall.Mmap(int(rbFile.Fd()), 0, DDR_size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
 	if err != nil {
+		fmt.Printf(" cant map module at \r\n")
 		log.Fatal(err)
 	}
+	fmt.Printf(" mapped module at 0x%08x \r\n", unsafe.Pointer(&rbMmap[0]))
 
 	//TcpServer trigger and addr_detector_ready
 	var addr_detector_ready = 0x0F60
