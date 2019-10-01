@@ -1,18 +1,5 @@
 package main
 
-import (
-	"fmt"
-	"log"
-	"os"
-	"runtime"
-	"syscall"
-	"time"
-	"unsafe"
-
-	"github.com/akutz/goof"
-	"golang.org/x/exp/mmap"
-)
-
 // #include <fcntl.h>           /* For O_* constants */
 // #include <sys/stat.h>        /* For mode constants */
 // #include <semaphore.h>
@@ -65,6 +52,19 @@ const struct timespec* new_timespec(time_t sec, long nsec) {
 }
 */
 import "C"
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"runtime"
+	"syscall"
+	"time"
+	"unsafe"
+
+	"github.com/akutz/goof"
+	"golang.org/x/exp/mmap"
+)
 
 type Semaphore interface {
 
@@ -140,6 +140,7 @@ func open(name string, excl bool) (Semaphore, error) {
 		sema:  unsafe.Pointer(sema),
 	}, nil
 }
+
 func (s *semaphore) Close() error {
 	err := C._sem_close(s.sema)
 	if err == 0 {
