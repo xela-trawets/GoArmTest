@@ -71,7 +71,7 @@ type semaphore struct {
 	sema  unsafe.Pointer
 }
 
-func open(name string, excl bool) (*semaphore, error) {
+func openSem(name string, excl bool) (*semaphore, error) {
 	name = fmt.Sprintf("/%s", name)
 	cName := C.CString(name)
 
@@ -159,7 +159,10 @@ func memcpy(dest, src []byte) int {
 
 func main() {
 	fmt.Println("Hello World")
-	mysem = semaphore.open("trigger_sem", false)
+	mysem, err := openSem("trigger_sem", false)
+	if err != nil {
+		fmt.Println("Error on openSem: ", err)
+	}
 	//mysem = syscall.sem_open("trigger_sem", O_CREAT, 777, 0)
 	var base int64 = 0x35c00000 //1048576 * 768
 	//	var c128: complex128 = 0
