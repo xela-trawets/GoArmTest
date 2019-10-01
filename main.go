@@ -263,7 +263,8 @@ func main() {
 	//DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" Awaiting Data 0x%08x \r\n", rbMmap[0])
 
-	t = mysem.TryWait() //while ...
+	//t :=
+	mysem.TryWait() //while ...
 	//mysem.Wait()
 
 	fmt.Printf(" Sem triggered 0x%08x \r\n", t)
