@@ -226,6 +226,8 @@ func main() {
 	__dma_ddr_size_reg := 0x08
 	__dma_ddr_base_reg := 0x04
 	__dma_ddr_head_reg := 0x2c
+	var __DDR_head int64 = int64(*(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_head_reg])))
+	fmt.Printf(" DDR head understood to be at 0x%08x \r\n", __DDR_head)
 	var __DDR_base int64 = int64(*(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg])))
 	fmt.Printf(" DDR base understood to be at 0x%08x \r\n", __DDR_base)
 	DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
