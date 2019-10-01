@@ -267,7 +267,7 @@ func main() {
 	mysem.TryWait() //while ...
 	//mysem.Wait()
 
-	fmt.Printf(" Sem triggered 0x%08x \r\n", t)
+	fmt.Printf(" Sem triggered 0x%08x \r\n")
 
 	rbBase := *(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg]))
 	pHead := (*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_head_reg]))
