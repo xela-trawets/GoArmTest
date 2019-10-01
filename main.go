@@ -187,6 +187,13 @@ func main() {
 	// 	fmt.Printf("Hello %x\n", regMmap[addr_BitsPerPixel+i])
 	// }
 	fmt.Printf("Hello %x\n", regMmap[addr_imaging_units])
+	var addr_detector_ready = 0x0F60
+	*(*int32)(unsafe.Pointer(&(regMmap[addr_detector_ready]))) = 0
+	detector_ready := *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
+	fmt.Printf(" addr_detector_ready 0x%08x \r\n", detector_ready)
+	*(*int32)(unsafe.Pointer(&regMmap[addr_detector_ready])) = 1
+	detector_ready = *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
+	fmt.Printf(" addr_detector_ready 0x%08x \r\n", detector_ready)
 
 	//	__DMA_AND_DATA_SOURCE := "/dev/uio3"
 	//  MAIN_MEMORY_ACCESS = /dev/mydevice
@@ -240,9 +247,9 @@ func main() {
 	fmt.Printf(" mapped module at 0x%08x \r\n", unsafe.Pointer(&rbMmap[0]))
 
 	//TcpServer trigger and addr_detector_ready
-	var addr_detector_ready = 0x0F60
+	//var addr_detector_ready = 0x0F60
 	*(*int32)(unsafe.Pointer(&(regMmap[addr_detector_ready]))) = 0
-	detector_ready := *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
+	detector_ready = *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
 	fmt.Printf(" addr_detector_ready 0x%08x \r\n", detector_ready)
 	*(*int32)(unsafe.Pointer(&regMmap[addr_detector_ready])) = 1
 	detector_ready = *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
