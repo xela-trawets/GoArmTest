@@ -232,13 +232,14 @@ func main() {
 	}
 
 	//TcpServer trigger and addr_detector_ready
-	var addr_detector_ready = 0x0F60
-	detector_ready := *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
-	fmt.Printf(" addr_detector_ready 0x%08x \r\n", detector_ready)
-	*(*int32)(unsafe.Pointer(&regMmap[addr_detector_ready])) = 1
+	// var addr_detector_ready = 0x0F60
+	// detector_ready := *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
+	// fmt.Printf(" addr_detector_ready 0x%08x \r\n", detector_ready)
+	// *(*int32)(unsafe.Pointer(&regMmap[addr_detector_ready])) = 1
 	//RingBuffer := (*uint32)(unsafe.Pointer(&rbMmap[0]))
 	//DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" Awaiting Data 0x%08x \r\n", rbMmap[0])
+
 	mysem.TryWait()
 	fmt.Printf(" Sem triggered 0x%08x \r\n", rbMmap[0])
 
