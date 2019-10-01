@@ -176,7 +176,7 @@ func main() {
 		log.Fatal(err)
 	}
 	defer regMapFile.Close()
-	regMmap, err := syscall.Mmap(int(regMapFile.Fd()), 0, 2*4096, syscall.PROT_READ, syscall.MAP_SHARED)
+	regMmap, err := syscall.Mmap(int(regMapFile.Fd()), 0, 2*4096, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -188,7 +188,7 @@ func main() {
 	// }
 	fmt.Printf("Hello %x\n", regMmap[addr_imaging_units])
 	var addr_detector_ready = 0x0F60
-	*(*int32)(unsafe.Pointer(&(regMmap[addr_detector_ready]))) = 0
+	//*(*int32)(unsafe.Pointer(&(regMmap[addr_detector_ready]))) = 0
 	detector_ready := *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
 	fmt.Printf(" addr_detector_ready 0x%08x \r\n", detector_ready)
 	*(*int32)(unsafe.Pointer(&regMmap[addr_detector_ready])) = 1
