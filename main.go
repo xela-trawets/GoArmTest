@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"../goarmtest/semaphore"
+	"../GoArmTest/semaphore"
 	"golang.org/x/exp/mmap"
 )
 
