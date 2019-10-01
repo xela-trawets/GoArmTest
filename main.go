@@ -198,7 +198,7 @@ func main() {
 
 	defer file.Close()
 	var baseAddress int64 = 0x0
-	var bufferSize = 2 * 0x1000
+	var bufferSize = 1 * 0x1000
 
 	mmap2, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ, syscall.MAP_SHARED)
 	if err != nil {
