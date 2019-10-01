@@ -11,7 +11,10 @@ import (
 	"golang.org/x/exp/mmap"
 )
 
-//#include <string.h>
+/*
+#include <string.h>
+#include <semaphore.h>
+*/
 import "C"
 
 func memcpy(dest, src []byte) int {
@@ -28,7 +31,8 @@ func memcpy(dest, src []byte) int {
 
 func main() {
 	fmt.Println("Hello World")
-	//mysem = semaphore.Open("trigger_sem", O_CREAT, 777, 0)
+	mysem = C.sem_open("trigger_sem", syscall.O_CREAT, 0777, 0)
+	//mysem = syscall.sem_open("trigger_sem", O_CREAT, 777, 0)
 	var base int64 = 0x35c00000 //1048576 * 768
 	//	var c128: complex128 = 0
 	var value = Readu32(base, 0)
@@ -41,14 +45,6 @@ func main() {
 	}
 	addr_imaging_units := 0x0F8C
 	addr_BitsPerPixel := 0x0F98
-
-	//addr_total_onboard_ram_lower := 0x1080
-	//__dma_ddr_size_reg := 0x08
-	//__dma_ddr_head_reg := 0x2c
-	//__dma_ddr_base_reg := 0x04
-	for i := 0; i < 300; i++ {
-		//fmt.Printf("Hello %x\n", mapped.At(i*4))
-	}
 
 	for i := 0; i < 4; i++ {
 		fmt.Printf("Hello %x\n", mapped.At(addr_BitsPerPixel+i))
@@ -70,38 +66,33 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// mapped2, err := mmap.Open("/dev/uio3")
-	// if err != nil {
-	// 	fmt.Println("Error mmapping 2: ", err)
-	// }
-	//__dma_ddr_base_reg := 0x04
+
 	for i := 0; i < 32; i++ {
 		offset := i * 4
 		value := *(*uint32)(unsafe.Pointer(&mmap2[offset]))
 		fmt.Printf("Hello %x\n", value) // mapped2.At(0x1000+addr_BitsPerPixel+i))
 	}
-
 	__dma_ddr_size_reg := 0x08
-	//__dma_ddr_head_reg := 0x2c
 	__dma_ddr_base_reg := 0x04
 	__DDR_base := *(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg]))
 	fmt.Printf(" DDR base understood to be at 0x%08x \r\n", __DDR_base)
 	DDR_size := *(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" DDR base understood to be at 0x%08x \r\n", DDR_size)
 
-	//__DDR_base = __ptrDMA[__dma_ddr_base_reg/4]
+	rbFile, err := os.OpenFile("/dev/mydevice", os.O_RDWR|O_SYNC) //os.O_RDWR, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// fd_dma = open(__DMA_AND_DATA_SOURCE, O_RDWR);
-	// if (fd_dma < 1) {
-	// ptr = 0;
-	// printf("Invalid UIO device file\n\r");
-	// }
-	// else {
-	// /* mmap the UIO device */
-	// ptr = (pvui)mmap(NULL, UIO_MAP_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd_dma, offset);
-	// }
+	defer rbFile.Close()
 
-	//*((uint32_t*)(ptrRegBank + addr_detector_ready )) = 1;
+	//PROT_READ | PROT_WRITE,  MAP_SHARED , fd_mem, __DDR_offset );
+	rbMmap2, err := syscall.Mmap(int(rbfile.Fd()), __DDR_base, DDR_size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	RingBuffer := *(*uint32)(unsafe.Pointer(&mmap2[offset]))
 }
 
 // pvui open_dma( off_t offset)
