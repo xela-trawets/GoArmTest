@@ -72,7 +72,7 @@ type semaphore struct {
 	sema  unsafe.Pointer
 }
 
-func open(name string, excl bool) (Semaphore, error) {
+func open(name string, excl bool) (*semaphore, error) {
 	name = fmt.Sprintf("/%s", name)
 	cName := C.CString(name)
 
