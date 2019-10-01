@@ -194,14 +194,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Printf(" opened uio3 at 0x%08x \r\n", file.Fd)
 
 	defer file.Close()
-	var baseAddress int64 = 0x1000
+	var baseAddress int64 = 0x0
 	var bufferSize = 2 * 0x1000
 
 	mmap2, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ, syscall.MAP_SHARED)
 	if err != nil {
-		fmt.Printf(" Cant mapped uio3 \r\n")
+		fmt.Printf(" Cant map uio3 \r\n")
 		log.Fatal(err)
 	}
 	fmt.Printf(" mapped uio3 at 0x%08x \r\n", unsafe.Pointer(&mmap2[0]))
