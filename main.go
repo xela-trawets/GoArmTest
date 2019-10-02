@@ -160,12 +160,12 @@ func mapFile(fileName string, base int, size int) (data []byte, err error) {
 	mapFile, err := os.OpenFile("/usr/share/client", os.O_RDWR, 0755)
 	if err != nil {
 		return nil, goof.WithFields(goof.Fields{
-			"name":  fileNname,
+			"name":  fileName,
 			"error": err,
 		}, "error opening file")
 	}
 	defer mapFile.Close()
-	data, err := syscall.Mmap(int(mapFile.Fd()), base, size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
+	data, err = syscall.Mmap(int(mapFile.Fd()), int64(base), size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
 	return
 }
 func main() {
@@ -185,7 +185,7 @@ func main() {
 	fmt.Printf("Hello %s/%s\n", runtime.GOOS, runtime.GOARCH)
 	//mysem, err := sync.NewSemaphore("trigger_sem", O_CREAT, 777, 0)
 
-	regMapFile, err := mapFile("/usr/share/client", 0, 2*4096)
+	regMmap, err := mapFile("/usr/share/client", 0, 2*4096)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -212,7 +212,7 @@ func main() {
 
 	//	__DMA_AND_DATA_SOURCE := "/dev/uio3"
 	//  MAIN_MEMORY_ACCESS = /dev/mydevice
-	var baseAddress int64 = 0x1000
+	var baseAddress = 0x1000
 	var bufferSize = 1 * 0x1000
 	mmap2, err := mapFile("/dev/uio3", baseAddress, bufferSize)
 	// file, err := os.OpenFile("/dev/uio3", os.O_RDWR, 0755)
