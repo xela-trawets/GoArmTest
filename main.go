@@ -249,7 +249,7 @@ func main() {
 	DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" DDR Size understood to be at 0x%08x \r\n", DDR_size)
 
-	rbFile, err := mapFile("/dev/mydevice", baseAddress, bufferSize)
+	rbMmap, err := mapFile("/dev/mydevice", baseAddress, bufferSize)
 	// rbFile, err := os.OpenFile("/dev/mydevice", os.O_RDWR|os.O_SYNC, 0755)
 	// if err != nil {
 	// 	fmt.Printf(" My Device Not Opened 0x%08x \r\n", rbFile.Fd)
