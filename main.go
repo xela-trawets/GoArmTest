@@ -156,12 +156,24 @@ func memcpy(dest, src []byte) int {
 	return n
 }
 
+func mapFile(fileName string, base int, size int) (data []byte, err error){
+	mapFile, err := os.OpenFile("/usr/share/client", os.O_RDWR, 0755)
+	if err != nil {
+		return nil, goof.WithFields(goof.Fields{
+			"name":  fileNname,
+			"error": err,
+		}, "error opening file")
+	}
+	defer mapFile.Close()
+	data, err := syscall.Mmap(int(mapFile.Fd()), base, size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
+	return (data, err)
+}
 func main() {
 	fmt.Println("Hello World")
 	mysem, err := openSem("trigger_sem", false)
 	if err != nil {
 		fmt.Println("Error on openSem: ", err)
-		log.Fatal(err)
+		log.Panicln(err)
 	}
 	fmt.Println("No Error on openSem: ", err)
 	defer mysem.Close()
@@ -172,15 +184,16 @@ func main() {
 	fmt.Printf("Hello %x\n", value)
 	fmt.Printf("Hello %s/%s\n", runtime.GOOS, runtime.GOARCH)
 	//mysem, err := sync.NewSemaphore("trigger_sem", O_CREAT, 777, 0)
-	regMapFile, err := os.OpenFile("/usr/share/client", os.O_RDWR, 0755)
+	
+	regMapFile, err := mapFile("/usr/share/client", 0, 2*4096 )
 	if err != nil {
-		log.Fatal(err)
+		log.Panicln(err)
 	}
-	defer regMapFile.Close()
-	regMmap, err := syscall.Mmap(int(regMapFile.Fd()), 0, 2*4096, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// defer regMapFile.Close()
+	//regMmap, err := syscall.Mmap(int(regMapFile.Fd()), 0, 2*4096, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 	defer syscall.Munmap(regMmap)
 	addr_imaging_units := 0x0F8C
 	// addr_BitsPerPixel := 0x0F98
@@ -190,7 +203,7 @@ func main() {
 	// }
 	fmt.Printf("Hello %x\n", regMmap[addr_imaging_units])
 	var addr_detector_ready = 0x0F60
-	//*(*int32)(unsafe.Pointer(&(regMmap[addr_detector_ready]))) = 0
+	*(*int32)(unsafe.Pointer(&regMmap[addr_detector_ready])) = 0
 	detector_ready := *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
 	fmt.Printf(" addr_detector_ready 0x%08x \r\n", detector_ready)
 	*(*int32)(unsafe.Pointer(&regMmap[addr_detector_ready])) = 1
@@ -199,20 +212,23 @@ func main() {
 
 	//	__DMA_AND_DATA_SOURCE := "/dev/uio3"
 	//  MAIN_MEMORY_ACCESS = /dev/mydevice
-	file, err := os.OpenFile("/dev/uio3", os.O_RDWR, 0755)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf(" opened uio3 at 0x%08x \r\n", file.Fd)
-
-	defer file.Close()
 	var baseAddress int64 = 0x1000
 	var bufferSize = 1 * 0x1000
+	mmap2, err := mapFile("/dev/uio3",  baseAddress, bufferSize )
+	// file, err := os.OpenFile("/dev/uio3", os.O_RDWR, 0755)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Printf(" opened uio3 at 0x%08x \r\n", file.Fd)
 
-	mmap2, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ, syscall.MAP_SHARED)
+	// defer file.Close()
+	// var baseAddress int64 = 0x1000
+	// var bufferSize = 1 * 0x1000
+
+	//mmap2, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ, syscall.MAP_SHARED)
 	if err != nil {
 		fmt.Printf(" Cant map uio3 \r\n")
-		log.Fatal(err)
+		log.Panicln(err)
 	}
 	fmt.Printf(" mapped uio3 at 0x%08x \r\n", unsafe.Pointer(&mmap2[0]))
 	defer syscall.Munmap(mmap2)
@@ -233,22 +249,23 @@ func main() {
 	DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" DDR Size understood to be at 0x%08x \r\n", DDR_size)
 
-	rbFile, err := os.OpenFile("/dev/mydevice", os.O_RDWR|os.O_SYNC, 0755)
-	if err != nil {
-		fmt.Printf(" My Device Not Opened 0x%08x \r\n", rbFile.Fd)
-		log.Fatal(err)
-	}
+	rbFile, err := mapFile("/dev/mydevice",  baseAddress, bufferSize )
+	// rbFile, err := os.OpenFile("/dev/mydevice", os.O_RDWR|os.O_SYNC, 0755)
+	// if err != nil {
+	// 	fmt.Printf(" My Device Not Opened 0x%08x \r\n", rbFile.Fd)
+	// 	log.Fatal(err)
+	// }
 
-	fmt.Printf(" My Device Opened 0x%08x \r\n", rbFile.Fd)
-	defer rbFile.Close()
+	// fmt.Printf(" My Device Opened 0x%08x \r\n", rbFile.Fd)
+	// defer rbFile.Close()
 
-	//PROT_READ | PROT_WRITE,  MAP_SHARED , fd_mem, __DDR_offset );
-	//rbMmap2, err := syscall.Mmap(int(rbFile.Fd()), __DDR_base, DDR_size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
-	//using kernel module
-	rbMmap, err := syscall.Mmap(int(rbFile.Fd()), 0, DDR_size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
+	// //PROT_READ | PROT_WRITE,  MAP_SHARED , fd_mem, __DDR_offset );
+	// //rbMmap2, err := syscall.Mmap(int(rbFile.Fd()), __DDR_base, DDR_size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
+	// //using kernel module
+	// rbMmap, err := syscall.Mmap(int(rbFile.Fd()), 0, DDR_size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
 	if err != nil {
 		fmt.Printf(" cant map module at \r\n")
-		log.Fatal(err)
+		log.Panicln(err)
 	}
 	fmt.Printf(" mapped module at 0x%08x \r\n", unsafe.Pointer(&rbMmap[0]))
 	defer syscall.Munmap(rbMmap)
@@ -324,7 +341,7 @@ func Readu32(baseAddress int64, offset int64) uint32 {
 
 	file, err := os.Open("/dev/mem")
 	if err != nil {
-		log.Fatal(err)
+		log.Panicln(err)
 	}
 
 	// fdSharedFile = open("/usr/share/client", O_RDWR);
@@ -364,12 +381,12 @@ func Readu32(baseAddress int64, offset int64) uint32 {
 	mmap, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ, syscall.MAP_SHARED)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Panicln(err)
 	}
 	value = *(*uint32)(unsafe.Pointer(&mmap[offset]))
 	err = syscall.Munmap(mmap)
 	if err != nil {
-		log.Fatal(err)
+		log.Panicln(err)
 	}
 	return value
 }
