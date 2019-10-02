@@ -177,31 +177,17 @@ func main() {
 	}
 	fmt.Println("No Error on openSem: ", err)
 	defer mysem.Close()
-	//mysem = syscall.sem_open("trigger_sem", O_CREAT, 777, 0)
-	var base int64 = 0x35c00000 //1048576 * 768
-	//	var c128: complex128 = 0
-	var value = Readu32(base, 0)
-	fmt.Printf("Hello %x\n", value)
+
 	fmt.Printf("Hello %s/%s\n", runtime.GOOS, runtime.GOARCH)
-	//mysem, err := sync.NewSemaphore("trigger_sem", O_CREAT, 777, 0)
 
 	regMmap, err := mapFile("/usr/share/client", 0, 2*4096)
 	if err != nil {
 		log.Panicln(err)
 	}
-	// defer regMapFile.Close()
-	//regMmap, err := syscall.Mmap(int(regMapFile.Fd()), 0, 2*4096, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 	defer syscall.Munmap(regMmap)
-	addr_imaging_units := 0x0F8C
-	// addr_BitsPerPixel := 0x0F98
 
-	// for i := 0; i < 4; i++ {
-	// 	fmt.Printf("Hello %x\n", regMmap[addr_BitsPerPixel+i])
-	// }
-	fmt.Printf("Hello %x\n", regMmap[addr_imaging_units])
+	addr_imaging_units := 0x0F8C
+	fmt.Printf("num imaging units %x\n", regMmap[addr_imaging_units])
 	var addr_detector_ready = 0x0F60
 	*(*int32)(unsafe.Pointer(&regMmap[addr_detector_ready])) = 0
 	detector_ready := *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
@@ -210,22 +196,7 @@ func main() {
 	detector_ready = *(*int)(unsafe.Pointer(&regMmap[addr_detector_ready]))
 	fmt.Printf(" addr_detector_ready 0x%08x \r\n", detector_ready)
 
-	//	__DMA_AND_DATA_SOURCE := "/dev/uio3"
-	//  MAIN_MEMORY_ACCESS = /dev/mydevice
-	var baseAddress = 0x1000
-	var bufferSize = 1 * 0x1000
-	mmap2, err := mapFile("/dev/uio3", baseAddress, bufferSize)
-	// file, err := os.OpenFile("/dev/uio3", os.O_RDWR, 0755)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Printf(" opened uio3 at 0x%08x \r\n", file.Fd)
-
-	// defer file.Close()
-	// var baseAddress int64 = 0x1000
-	// var bufferSize = 1 * 0x1000
-
-	//mmap2, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ, syscall.MAP_SHARED)
+	mmap2, err := mapFile("/dev/uio3", 0x1000, 0x1000)
 	if err != nil {
 		fmt.Printf(" Cant map uio3 \r\n")
 		log.Panicln(err)
@@ -236,8 +207,7 @@ func main() {
 	for i := 0; i < 4; i++ {
 		offset := i * 4
 		value := *(*uint32)(unsafe.Pointer(&mmap2[offset]))
-		fmt.Printf("Hello %x\n", value) // mapped2.At(0x1000+addr_BitsPerPixel+i))
-		//log.Fatal(err)
+		fmt.Printf("Hello %x\n", value)
 	}
 	__dma_ddr_size_reg := 0x08
 	__dma_ddr_base_reg := 0x04
@@ -250,19 +220,6 @@ func main() {
 	fmt.Printf(" DDR Size understood to be at 0x%08x \r\n", DDR_size)
 
 	rbMmap, err := mapFile("/dev/mydevice", baseAddress, bufferSize)
-	// rbFile, err := os.OpenFile("/dev/mydevice", os.O_RDWR|os.O_SYNC, 0755)
-	// if err != nil {
-	// 	fmt.Printf(" My Device Not Opened 0x%08x \r\n", rbFile.Fd)
-	// 	log.Fatal(err)
-	// }
-
-	// fmt.Printf(" My Device Opened 0x%08x \r\n", rbFile.Fd)
-	// defer rbFile.Close()
-
-	// //PROT_READ | PROT_WRITE,  MAP_SHARED , fd_mem, __DDR_offset );
-	// //rbMmap2, err := syscall.Mmap(int(rbFile.Fd()), __DDR_base, DDR_size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
-	// //using kernel module
-	// rbMmap, err := syscall.Mmap(int(rbFile.Fd()), 0, DDR_size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
 	if err != nil {
 		fmt.Printf(" cant map module at \r\n")
 		log.Panicln(err)
@@ -292,91 +249,16 @@ func main() {
 	pHead := (*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_head_reg]))
 
 	fmt.Printf(" head 0x%08x \r\n", (*pHead)-rbBase)
-	//*(*uint32)(unsafe.Pointer(&mmap2[__dma_ddr_base_reg])))
-	//mysem.Close()
 }
-
-// pvui open_dma( off_t offset)
-// {
-
-// pvui ptr;
-
-// 	/* Open the UIO device file */
-// 	fd_dma = open(__DMA_AND_DATA_SOURCE, O_RDWR);
-// 	if (fd_dma < 1) {
-// 	ptr = 0;
-// 	printf("Invalid UIO device file\n\r");
-// 	}
-// 	else {
-// 	/* mmap the UIO device */
-// 	//ptr = (pvui)mmap(NULL, UIO_MAP_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd_dma, offset);
-// 	ptr = (pvui)mmap(NULL, UIO_MAP_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd_dma, offset);
-// 	//*((unsigned *)(ptr + 4)) = 1344;
-// 	}
-// 	return ptr;
-// }
-// void close_dma(pvui ptr)
-// {
-
-//     munmap((void*)ptr, UIO_MAP_SIZE);
-//     close(fd_dma);
-// }
 
 func Readu32(baseAddress int64, offset int64) uint32 {
 	var value uint32 = 0xFFFFFFFF
 	const bufferSize int = 4096
-	// 	int __DMA_base = 0x40001000;
-	// int __DDR_base = 0x20000000;
-	// int __dma_ddr_size_reg = 0x08;
-	// int __dma_ddr_head_reg = 0x2c;
-	// int __dma_ddr_top_reg = 0x28;
-	// int __dma_ddr_base_reg = 0x04;
-
-	// __dma_ddr_base_reg = 0x40001000
-	// DDR_base = 0x35c00000
-	//__dma_ddr_base_reg = iniparser_getint(ini, "offsets:dma_ddr_base_reg", 0x04)
-	//__dma_ddr_size_reg = iniparser_getint(ini, "offsets:dma_ddr_size_reg", 0x08)
-	//__dma_ddr_head_reg = iniparser_getint(ini, "offsets:dma_ddr_head_reg", 0x2c)
-	//__dma_ddr_top_reg = iniparser_getint(ini, "offsets:dma_ddr_top_reg", 0x28)
 
 	file, err := os.Open("/dev/mem")
 	if err != nil {
 		log.Panicln(err)
 	}
-
-	// fdSharedFile = open("/usr/share/client", O_RDWR);
-	// if (fdSharedFile < 1) {
-	//   perror("no shared file");
-
-	// } else {
-	//   /* mmap the device into memory */
-
-	//   ptrSharedFile = mmap(NULL, page_size * 2, PROT_READ | PROT_WRITE, MAP_SHARED , fdSharedFile, 0x00);
-
-	//   fprintf(stdout,"ASSEMBLER: Mapped %d bytes (2 pages) from /usr/share/client at offset %d \n", page_size * 2, 0x00);
-	// }
-
-	// ptrRegBank = ptrSharedFile;
-
-	//   initDevices();
-	// //ptrRegBank += 4;
-
-	//   *((uint32_t*)(ptrRegBank + addr_assembler_version )) =  version2();
-	//   *((uint32_t*)(ptrRegBank + addr_usleep_send )) = 10;
-	//   *((uint32_t*)(ptrRegBank + addr_detector_ready )) = 0;
-
-	// 	__DDR_base = __ptrDMA[__dma_ddr_base_reg / 4];
-	// 	fprintf(stdout, " DDR base understood to be at 0x%08x \r\n", __DDR_base );
-	// DDR_size = __ptrDMA[__dma_ddr_size_reg / 4];
-	// 	fprintf(stdout, " DDR base understood to be at 0x%08x \r\n", DDR_size );
-
-	// 	if(cverbose) fprintf(stdout, " Mapping ring buffer @ 0x%08x 0x%08x \r\n", __DDR_base , DDR_size );
-
-	// 	__DDR_offset = 0;
-	// 	fprintf(stdout, "Hamdan: %d\n", __DDR_offset);
-	// 	ptrBaton =  (pvui)mmap(NULL, DDR_size  , PROT_READ | PROT_WRITE,  MAP_SHARED , fd_mem, __DDR_offset ); // see detector config or 0x00000
-
-	//	0x38100000 0x07d00000
 	defer file.Close()
 	mmap, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ, syscall.MAP_SHARED)
 
