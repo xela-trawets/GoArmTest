@@ -219,7 +219,8 @@ func main() {
 	DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" DDR Size understood to be at 0x%08x \r\n", DDR_size)
 
-	rbMmap, err := mapFile("/dev/mydevice", baseAddress, bufferSize)
+	//for kernel module map from zero base
+	rbMmap, err := mapFile("/dev/mydevice", 0, DDR_size)
 	if err != nil {
 		fmt.Printf(" cant map module at \r\n")
 		log.Panicln(err)
@@ -259,6 +260,7 @@ func Readu32(baseAddress int64, offset int64) uint32 {
 	if err != nil {
 		log.Panicln(err)
 	}
+
 	defer file.Close()
 	mmap, err := syscall.Mmap(int(file.Fd()), baseAddress, bufferSize, syscall.PROT_READ, syscall.MAP_SHARED)
 
