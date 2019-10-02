@@ -159,6 +159,7 @@ func memcpy(dest, src []byte) int {
 func mapFile(fileName string, base int, size int) (data []byte, err error) {
 	mapFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_SYNC, 0755)
 	if err != nil {
+		fmt.Println("Error on open file: ", err)
 		return nil, goof.WithFields(goof.Fields{
 			"name":  fileName,
 			"error": err,
