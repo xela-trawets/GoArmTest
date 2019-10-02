@@ -156,7 +156,7 @@ func memcpy(dest, src []byte) int {
 	return n
 }
 
-func mapFile(fileName string, base int, size int) (data []byte, err error){
+func mapFile(fileName string, base int, size int) (data []byte, err error) {
 	mapFile, err := os.OpenFile("/usr/share/client", os.O_RDWR, 0755)
 	if err != nil {
 		return nil, goof.WithFields(goof.Fields{
@@ -166,7 +166,7 @@ func mapFile(fileName string, base int, size int) (data []byte, err error){
 	}
 	defer mapFile.Close()
 	data, err := syscall.Mmap(int(mapFile.Fd()), base, size, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_SHARED)
-	return (data, err)
+	return
 }
 func main() {
 	fmt.Println("Hello World")
@@ -184,8 +184,8 @@ func main() {
 	fmt.Printf("Hello %x\n", value)
 	fmt.Printf("Hello %s/%s\n", runtime.GOOS, runtime.GOARCH)
 	//mysem, err := sync.NewSemaphore("trigger_sem", O_CREAT, 777, 0)
-	
-	regMapFile, err := mapFile("/usr/share/client", 0, 2*4096 )
+
+	regMapFile, err := mapFile("/usr/share/client", 0, 2*4096)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -214,7 +214,7 @@ func main() {
 	//  MAIN_MEMORY_ACCESS = /dev/mydevice
 	var baseAddress int64 = 0x1000
 	var bufferSize = 1 * 0x1000
-	mmap2, err := mapFile("/dev/uio3",  baseAddress, bufferSize )
+	mmap2, err := mapFile("/dev/uio3", baseAddress, bufferSize)
 	// file, err := os.OpenFile("/dev/uio3", os.O_RDWR, 0755)
 	// if err != nil {
 	// 	log.Fatal(err)
@@ -249,7 +249,7 @@ func main() {
 	DDR_size := *(*int)(unsafe.Pointer(&mmap2[__dma_ddr_size_reg]))
 	fmt.Printf(" DDR Size understood to be at 0x%08x \r\n", DDR_size)
 
-	rbFile, err := mapFile("/dev/mydevice",  baseAddress, bufferSize )
+	rbFile, err := mapFile("/dev/mydevice", baseAddress, bufferSize)
 	// rbFile, err := os.OpenFile("/dev/mydevice", os.O_RDWR|os.O_SYNC, 0755)
 	// if err != nil {
 	// 	fmt.Printf(" My Device Not Opened 0x%08x \r\n", rbFile.Fd)
